@@ -1,25 +1,36 @@
 [project]
 name = "mcp-datovka"
 version = "0.1.0"
-description = "MCP server for Czech ISDS (datove schranky) - multi-box data message management"
+description = "MCP server for Czech ISDS (datove schranky) - read, send, and manage data messages across multiple data boxes"
 requires-python = ">=3.11"
 license = "MIT"
 authors = [{name = "Sensio.cz", email = "info@sensio.cz"}]
 readme = "README.md"
-keywords = ["mcp", "isds", "datovka", "datova-schranka", "czech"]
+keywords = ["mcp", "isds", "datovka", "datova-schranka", "czech", "model-context-protocol", "datove-schranky"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Communications :: Email",
+    "Topic :: Office/Business",
+    "Intended Audience :: Developers",
 ]
 dependencies = [
     "mcp[cli]>=1.0.0",
     "zeep>=4.2.0",
     "python-dotenv>=1.0.0",
+    "requests>=2.28.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/Sensio-cz/mcp-datovka"
+Repository = "https://github.com/Sensio-cz/mcp-datovka"
 Issues = "https://github.com/Sensio-cz/mcp-datovka/issues"
+Changelog = "https://github.com/Sensio-cz/mcp-datovka/blob/master/CHANGELOG.md"
 
 [project.scripts]
 mcp-datovka = "mcp_datovka.__main__:main"

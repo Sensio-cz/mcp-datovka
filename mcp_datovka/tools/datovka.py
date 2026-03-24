@@ -94,6 +94,9 @@ def register_tools(mcp: FastMCP):
         attachment = isds.download_attachment(box, message_id, attachment_index)
         return json.dumps(attachment, ensure_ascii=False)
 
+    # In-memory store for prepared messages awaiting confirmation
+    _pending_messages: dict[str, dict] = {}
+
     @mcp.tool()
     def datovka_send_message(
         from_box_alias: str,
@@ -101,8 +104,16 @@ def register_tools(mcp: FastMCP):
         subject: str,
         body: str | None = None,
         files: str | None = None,
+        confirmed: bool = False,
     ) -> str:
-        """Send a data message. REQUIRES explicit user approval - data messages have legal weight.
+        """Send a data message. Data messages have the legal weight of registered mail.
+
+        IMPORTANT: This tool uses a two-step confirmation flow.
+        - First call (confirmed=false): prepares the message and returns a preview with a confirmation_id.
+          The AI MUST show this preview to the user and ask for explicit approval.
+        - Second call (confirmed=true): set confirmed=true and pass the same parameters to actually send.
+
+        The AI assistant MUST NOT set confirmed=true without the user explicitly approving the send.
 
         Args:
             from_box_alias: Alias of the sending box
@@ -110,6 +121,7 @@ def register_tools(mcp: FastMCP):
             subject: Message subject (dmAnnotation)
             body: Optional message body text
             files: Optional JSON array of [{filename, mime_type, content_base64}]
+            confirmed: Set to true ONLY after user has explicitly approved the send. Default: false.
         """
         box = get_box(from_box_alias)
         if not box:
@@ -119,6 +131,32 @@ def register_tools(mcp: FastMCP):
         if files:
             parsed_files = json.loads(files)
 
+        if not confirmed:
+            # Step 1: Return preview for user approval
+            file_summary = []
+            if parsed_files:
+                for f in parsed_files:
+                    file_summary.append({
+                        "filename": f.get("filename", "unknown"),
+                        "mime_type": f.get("mime_type", "unknown"),
+                        "size_bytes": len(f.get("content_base64", "")) * 3 // 4,
+                    })
+
+            preview = {
+                "status": "awaiting_confirmation",
+                "warning": "Data messages have the legal effect of registered mail. The user MUST explicitly approve before sending.",
+                "from_box": from_box_alias,
+                "from_box_id": box.box_id,
+                "to_box_id": to_box_id,
+                "subject": subject,
+                "body": body[:200] if body else None,
+                "attachments": file_summary,
+                "instruction": "Show this preview to the user. If they approve, call datovka_send_message again with confirmed=true and the same parameters.",
+            }
+            return json.dumps(preview, ensure_ascii=False)
+
+        # Step 2: User confirmed - actually send
+        logger.info(f"Sending confirmed message from {from_box_alias} to {to_box_id}: {subject}")
         result = isds.send_message(
             box,
             to_box_id=to_box_id,
