@@ -101,8 +101,10 @@ def list_received(box: BoxConfig, from_date: str | None = None, max_results: int
     try:
         # GetListOfReceivedMessages params: dmFromTime, dmToTime, dmRecipientOrgUnitNum,
         # dmStatusFilter (1=all, 2=unread), dmOffset, dmLimit
+        # dmStatusFilter: -1=all, 1=posted, 2=stamped, 3=virus, 4=delivered,
+        # 5=delivered by fiction, 6=read, 7=downloaded/removed
         kwargs = {
-            "dmStatusFilter": 1,
+            "dmStatusFilter": -1,
             "dmLimit": max_results,
             "dmOffset": 1,
         }
@@ -153,7 +155,7 @@ def list_sent(box: BoxConfig, from_date: str | None = None, max_results: int = 5
     client = _get_info_client(box)
     try:
         kwargs = {
-            "dmStatusFilter": 1,
+            "dmStatusFilter": -1,
             "dmLimit": max_results,
             "dmOffset": 1,
         }
@@ -311,20 +313,24 @@ def send_message(
         raise
 
 
-def search_box(box: BoxConfig, query: str) -> list[dict]:
+def search_box(box: BoxConfig, query: str, box_type: str | None = None) -> list[dict]:
     """Search for a data box by name, ICO, or ID."""
     client = _get_search_client(box)
     try:
         owner_info_type = client.get_type("{http://isds.czechpoint.cz/v20}tDbOwnerInfo")
 
         # Try to detect query type and build search params
+        # dbType: OVM=organ verejne moci, PO=pravnicka osoba, PFO=podnikajici FO, FO=fyzicka osoba
         kwargs = {}
         if query.isdigit() and len(query) == 8:
             kwargs["ic"] = query
+            if box_type:
+                kwargs["dbType"] = box_type
         elif len(query) == 7 and query.isalnum():
             kwargs["dbID"] = query
         else:
             kwargs["firmName"] = query
+            kwargs["dbType"] = box_type or "OVM"
 
         search = owner_info_type(**kwargs)
 

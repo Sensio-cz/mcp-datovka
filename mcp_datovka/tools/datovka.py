@@ -129,12 +129,13 @@ def register_tools(mcp: FastMCP):
         return json.dumps(result, ensure_ascii=False)
 
     @mcp.tool()
-    def datovka_search_box(query: str, box_alias: str | None = None) -> str:
+    def datovka_search_box(query: str, box_alias: str | None = None, box_type: str | None = None) -> str:
         """Search for a data box by name, ICO, or box ID.
 
         Args:
             query: Search term - company name, ICO (8 digits), or box ID (7 alphanumeric)
             box_alias: Optional - which box to use for the query (uses first configured if omitted)
+            box_type: Optional - box type filter: OVM (government), PO (company), PFO (self-employed), FO (person). Required for name search.
         """
         if box_alias:
             box = get_box(box_alias)
@@ -145,7 +146,7 @@ def register_tools(mcp: FastMCP):
         if not box:
             return json.dumps({"error": "No box available for search."})
 
-        results = isds.search_box(box, query)
+        results = isds.search_box(box, query, box_type=box_type)
         return json.dumps(results, ensure_ascii=False)
 
     @mcp.tool()
