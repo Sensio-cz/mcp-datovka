@@ -258,43 +258,41 @@ def send_message(
     """
     client = _get_operations_client(box)
     try:
+        NS = "{http://isds.czechpoint.cz/v20}"
+
         # Build envelope
-        envelope_type = client.get_type("ns2:dmEnvelope")
+        envelope_type = client.get_type(f"{NS}tMessageEnvelopeSub")
         envelope = envelope_type(
             dbIDRecipient=to_box_id,
             dmAnnotation=subject,
         )
 
-        # Build files
+        # Build files - dmFile has content as element and metadata as attributes
         dm_files = []
         if files:
-            file_type = client.get_type("ns2:dmFile")
             for i, f in enumerate(files):
-                dm_file = file_type(
-                    _dmFileDescr=f["filename"],
-                    _dmMimeType=f.get("mime_type", "application/octet-stream"),
-                    _dmFileMetaType="main" if i == 0 else "enclosure",
-                    dmEncodedContent=f["content_base64"],
-                )
-                dm_files.append(dm_file)
+                content = f["content_base64"]
+                if isinstance(content, str):
+                    content = base64.b64decode(content)
+                dm_files.append({
+                    "dmEncodedContent": content,
+                    "dmMimeType": f.get("mime_type", "application/octet-stream"),
+                    "dmFileMetaType": "main" if i == 0 else "enclosure",
+                    "dmFileDescr": f["filename"],
+                })
 
         # If body text provided, add as text attachment
         if body and not files:
-            file_type = client.get_type("ns2:dmFile")
-            dm_file = file_type(
-                _dmFileDescr="zprava.txt",
-                _dmMimeType="text/plain",
-                _dmFileMetaType="main",
-                dmEncodedContent=base64.b64encode(body.encode("utf-8")).decode("ascii"),
-            )
-            dm_files.append(dm_file)
-
-        files_container_type = client.get_type("ns2:dmFiles")
-        files_container = files_container_type(dmFile=dm_files)
+            dm_files.append({
+                "dmEncodedContent": body.encode("utf-8"),
+                "dmMimeType": "text/plain",
+                "dmFileMetaType": "main",
+                "dmFileDescr": "zprava.txt",
+            })
 
         response = client.service.CreateMessage(
             dmEnvelope=envelope,
-            dmFiles=files_container,
+            dmFiles={"dmFile": dm_files},
         )
 
         status_code = str(getattr(response.dmStatus, "dmStatusCode", ""))
