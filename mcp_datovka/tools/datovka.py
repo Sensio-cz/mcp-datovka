@@ -103,7 +103,7 @@ def register_tools(mcp: FastMCP):
         to_box_id: str,
         subject: str,
         body: str | None = None,
-        files: str | None = None,
+        files: str | list | None = None,
         confirmed: bool = False,
     ) -> str:
         """Send a data message. Data messages have the legal weight of registered mail.
@@ -129,7 +129,7 @@ def register_tools(mcp: FastMCP):
 
         parsed_files = None
         if files:
-            parsed_files = json.loads(files)
+            parsed_files = json.loads(files) if isinstance(files, str) else files
 
         if not confirmed:
             # Step 1: Return preview for user approval
