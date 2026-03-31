@@ -1,6 +1,6 @@
 [project]
 name = "mcp-datovka"
-version = "0.1.0"
+version = "0.2.0"
 description = "MCP server for Czech ISDS (datove schranky) - read, send, and manage data messages across multiple data boxes"
 requires-python = ">=3.11"
 license = "MIT"
@@ -26,6 +26,12 @@ dependencies = [
     "requests>=2.28.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/Sensio-cz/mcp-datovka"
 Repository = "https://github.com/Sensio-cz/mcp-datovka"
@@ -44,3 +50,6 @@ include = ["mcp_datovka*"]
 
 [tool.setuptools.package-data]
 mcp_datovka = ["../wsdl/*.wsdl", "../wsdl/*.xsd"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

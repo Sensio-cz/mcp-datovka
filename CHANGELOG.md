@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.0 (2026-03-31)
+
+### Fixes
+
+- `files` parameter in `datovka_send_message` now accepts both `str` and `list` (MCP SDK auto-parses JSON strings)
+- URL-safe base64 from Gmail API (`-_` instead of `+/`) is automatically converted to standard base64
+
+### Added
+
+- Comprehensive README with prerequisites, installation, configuration, usage examples, troubleshooting
+- CONTRIBUTING.md with development setup guide
+- SECURITY.md with vulnerability reporting policy
+- `__version__` constant in package
+- Automated test suite (config, tools, ISDS client, base64 handling)
+- Dev dependencies (pytest, pytest-cov)
+
 ## 0.1.0 (2026-03-24)
 
 Initial release.
