@@ -273,6 +273,11 @@ def send_message(
             for i, f in enumerate(files):
                 content = f["content_base64"]
                 if isinstance(content, str):
+                    # Gmail returns URL-safe base64 (-_ instead of +/)
+                    content = content.replace('-', '+').replace('_', '/')
+                    padding = 4 - len(content) % 4
+                    if padding < 4:
+                        content += '=' * padding
                     content = base64.b64decode(content)
                 dm_files.append({
                     "dmEncodedContent": content,
