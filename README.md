@@ -39,7 +39,7 @@ Install from source - the package is **not published on PyPI yet**, so
 ```bash
 git clone https://github.com/Sensio-cz/mcp-datovka.git
 cd mcp-datovka
-pip install .
+pip install .        # pro vyvoj: pip install -e .
 ```
 
 ## Configuration
@@ -93,7 +93,10 @@ Add to `.mcp.json`:
 }
 ```
 
-Or if using `.env` file in the project directory:
+Or using a `.env` file. **Careful:** it is looked up from the working directory
+of the MCP client process, not from the checkout - after `pip install .` those
+are two different places. Give the client a working directory that holds the
+`.env`, or pass the credentials in `env` as above.
 
 ```json
 {

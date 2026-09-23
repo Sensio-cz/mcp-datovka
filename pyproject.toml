@@ -43,7 +43,13 @@ Changelog = "https://github.com/Sensio-cz/mcp-datovka/blob/master/CHANGELOG.md"
 mcp-datovka = "mcp_datovka.__main__:main"
 
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+# SETUPTOOLS 77 JE MINIMUM, ne opatrnost: `license = "MIT"` jako SPDX vyraz
+# (PEP 639) umi az od te verze. S 75.8.2 i 76.1.0 build konci hlaskou
+# "invalid pyproject.toml config: 'project.license'", ktera vypada jako chyba
+# v souboru, ne jako stara verze nastroje - zmereno nezavislym reviewem
+# 23. 9. 2026. S beznou build isolation to pip zakryje, protoze si stahne
+# nejnovejsi; projevi se to pri --no-build-isolation a na offline strojich.
+requires = ["setuptools>=77.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
