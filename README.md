@@ -33,16 +33,13 @@ Enables AI assistants (Claude, Cursor, etc.) to read, send, and manage data mess
 
 ## Installation
 
-```bash
-pip install mcp-datovka
-```
-
-Or install from source:
+Install from source - the package is **not published on PyPI yet**, so
+`pip install mcp-datovka` does not work:
 
 ```bash
 git clone https://github.com/Sensio-cz/mcp-datovka.git
 cd mcp-datovka
-pip install -e .
+pip install .
 ```
 
 ## Configuration

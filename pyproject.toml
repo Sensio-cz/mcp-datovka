@@ -3,6 +3,10 @@ name = "mcp-datovka"
 version = "0.1.0"
 description = "MCP server for Czech ISDS (datove schranky) - read, send, and manage data messages across multiple data boxes"
 requires-python = ">=3.11"
+# Licence se uvadi JEN takhle (PEP 639). Klasifikator
+# "License :: OSI Approved :: MIT License" tu byl navic a soucasny setuptools
+# kvuli nemu odmita balik sestavit ("License classifiers have been superseded
+# by license expressions") - zmereno 23. 9. 2026, instalace skoncila chybou.
 license = "MIT"
 authors = [{name = "Sensio.cz", email = "info@sensio.cz"}]
 readme = "README.md"
@@ -13,14 +17,17 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Communications :: Email",
     "Topic :: Office/Business",
     "Intended Audience :: Developers",
 ]
 dependencies = [
-    "mcp[cli]>=1.0.0",
+    # HORNI MEZ JE NUTNA: v mcp 2.x zmizel `mcp.server.fastmcp` (FastMCP se
+    # prejmenoval na MCPServer), takze server.py se s nim ani nenaimportuje.
+    # Bez meze stahne pip nejnovejsi verzi a server na cisté instalaci vubec
+    # nenastartuje - zmereno 23. 9. 2026 na cistem stroji.
+    "mcp[cli]>=1.0.0,<2",
     "zeep>=4.2.0",
     "python-dotenv>=1.0.0",
     "requests>=2.28.0",
@@ -43,4 +50,4 @@ build-backend = "setuptools.build_meta"
 include = ["mcp_datovka*"]
 
 [tool.setuptools.package-data]
-mcp_datovka = ["../wsdl/*.wsdl", "../wsdl/*.xsd"]
+mcp_datovka = ["wsdl/*.wsdl", "wsdl/*.xsd"]

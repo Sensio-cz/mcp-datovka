@@ -15,7 +15,11 @@ from ..config import BoxConfig, get_soap_urls
 
 logger = logging.getLogger(__name__)
 
-WSDL_DIR = Path(__file__).parent.parent.parent / "wsdl"
+# WSDL PATRI DOVNITR BALIKU. Drive lezelo v korenu repozitare a cesta vedla
+# o uroven vys nez balik - to funguje jen v checkoutu. Po instalaci (pip, wheel)
+# je balik v site-packages a nad nim zadne `wsdl/` neni, takze kazde volani
+# skoncilo na FileNotFoundError. Zmereno 23. 9. 2026 pri nasazeni na server.
+WSDL_DIR = Path(__file__).parent.parent / "wsdl"
 
 
 class _RemoveNilPlugin:
